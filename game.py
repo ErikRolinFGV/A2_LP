@@ -39,16 +39,22 @@ class Game:
 
         self.tilemap = tilemap(self, tile_size=16)
 
+        self.scroll = [0, 0]
+
     # Método principal para rodar o jogo
     def run(self):
         while True:
             # Preenche a tela com uma cor de fundo (azul claro)
             self.display.fill((14, 219, 248))
 
-            self.tilemap.render(self.display)
+            self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]) / 30
+            self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1]) / 30
+            render_scroll = (int(self.scroll[0]), int(self.scroll[1]) )
+
+            self.tilemap.render(self.display, offset=self.scroll)
 
             self.player.update(self.tilemap, (self.moviment[1]- self.moviment[0], 0))
-            self.player.render(self.display)
+            self.player.render(self.display, offset=self.scroll)
 
 
             print(self.tilemap.physics_rects_collision(self.player.pos))
@@ -63,7 +69,7 @@ class Game:
                     if event.key == pygame.K_RIGHT:  # Tecla para mover para baixo
                         self.moviment[1] = True
                     if event.key == pygame.K_UP:
-                        self.player.velocity[1] = -3
+                        self.player.velocity[1] = -2.5
                 if event.type == pygame.KEYUP:  # Quando uma tecla é solta
                     if event.key == pygame.K_LEFT:  # Para o movimento para cima
                         self.moviment[0] = False

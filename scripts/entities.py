@@ -43,7 +43,7 @@ class Physics:
                     self.velocity[1] = 0  # Anula a velocidade vertical ao bater no teto
                 self.pos[1] = entity_rect.y  # Atualiza a posição Y com base na colisão
 
-    def render(self, surface):
+    def render(self, surface, offset=(0, 0)):
         # Renderiza a entidade na tela
-        surface.blit(self.game.assets['player'], self.pos)
+        surface.blit(self.game.assets['player'], (self.pos[0] - offset[0], self.pos[1] - offset[1]))
       
