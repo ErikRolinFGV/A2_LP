@@ -47,11 +47,11 @@ class Game:
 
             self.tilemap.render(self.display)
 
-            self.player.update((self.moviment[1]- self.moviment[0], 0))
+            self.player.update(self.tilemap, (self.moviment[1]- self.moviment[0], 0))
             self.player.render(self.display)
 
 
-
+            print(self.tilemap.physics_rects_collision(self.player.pos))
             # Processa eventos do teclado e do mouse
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:  # Fecha o jogo se clicar para sair
@@ -62,6 +62,8 @@ class Game:
                         self.moviment[0] = True
                     if event.key == pygame.K_RIGHT:  # Tecla para mover para baixo
                         self.moviment[1] = True
+                    if event.key == pygame.K_UP:
+                        self.player.velocity[1] = -3
                 if event.type == pygame.KEYUP:  # Quando uma tecla é solta
                     if event.key == pygame.K_LEFT:  # Para o movimento para cima
                         self.moviment[0] = False
