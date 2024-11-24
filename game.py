@@ -2,7 +2,8 @@ import pygame
 import sys
 
 from scripts.entities import Physics
-from scripts.util import load_image
+from scripts.util import load_image, load_images
+from scripts.tilemap import tilemap
 
 
 # Classe principal do jogo
@@ -22,18 +23,29 @@ class Game:
 
 
         self.assets = {
-            'player': load_image('entities/player.png')
+            'player': load_image('entities/player.png'),
+            'grass' : load_images('tiles/grass'),
+            'large_decor' : load_images('tiles/large_decor'),
+            'stone' : load_images('tiles/stone'),
+            'decor' : load_images('tiles/decor')
+            
         }
+
+        print(self.assets)
 
         self.player = Physics(self, "player", (50, 50), (8, 15))
 
         self.moviment = [False, False]
+
+        self.tilemap = tilemap(self, tile_size=16)
 
     # Método principal para rodar o jogo
     def run(self):
         while True:
             # Preenche a tela com uma cor de fundo (azul claro)
             self.display.fill((14, 219, 248))
+
+            self.tilemap.render(self.display)
 
             self.player.update((self.moviment[1]- self.moviment[0], 0))
             self.player.render(self.display)
