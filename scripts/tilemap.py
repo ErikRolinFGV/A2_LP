@@ -40,18 +40,24 @@ class tilemap:
         return rects  # Retorna os retângulos para colisão
     
     # Renderiza os tiles na superfície
-    def render(self, surface, offset=(0,0)):
-        # Renderiza tiles fora do grid
+    def render(self, surface, offset=(0, 0)):
+    # Renderiza tiles fora do grid
         for tile in self.offgrid_tiles:
-            surface.blit(self.game.assets[tile["type"]][tile["variant"]], (tile['pos'][0] - offset[0], tile['pos'][1] - offset[1]))
-        
-        # Renderiza tiles no grid
-        for loc in self.tilemap:
-            tile = self.tilemap[loc]
-            surface.blit(
-                self.game.assets[tile["type"]][tile["variant"]],
-                (tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1])
-            )
+            surface.blit(self.game.assets[tile["type"]][tile["variant"]], 
+                        (tile['pos'][0] - offset[0], tile['pos'][1] - offset[1]))
+
+        # Corrigido: converter para inteiros
+        for x in range(int(offset[0] // self.tile_size), 
+                    int((offset[0] + surface.get_width()) // self.tile_size) + 1):
+            for y in range(int(offset[1] // self.tile_size), 
+                        int((offset[1] + surface.get_height()) // self.tile_size) + 1):
+                loc = str(x) + ';' + str(y)
+                if loc in self.tilemap:
+                    tile = self.tilemap[loc]
+                    surface.blit(self.game.assets[tile["type"]][tile["variant"]], 
+                                (tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1]))
+
+
 
 
 
