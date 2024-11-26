@@ -39,7 +39,8 @@ class Game:
             "enemy/run": Animation(load_images("entities/enemy/run"), img_dur=4),
             "particles/leaf": Animation(load_images('particles/leaf'), img_dur=40, loop=False),
             "particles/particle": Animation(load_images('particles/particle'), img_dur=6, loop=False) ,
-            "gun": load_image("gun.png")
+            "gun": load_image("gun.png"),
+            "projectile": load_image("projectile.png")
         }
         
         self.clouds = Clouds(self.assets['clouds'], count=16)
@@ -53,7 +54,7 @@ class Game:
         for tree in self.tilemap.extract([('large_decor', 2)], keep=True):
             self.leaf_spawners.append(pygame.Rect(4 + tree['pos'][0], 4 + tree['pos'][1], 16, 16))
         print(self.leaf_spawners)
-
+        
         self.enemies = []
         for spawner in self.tilemap.extract([("spawners", 0), ("spawners", 1)]):
             if spawner["variant"] == 0:
@@ -62,6 +63,8 @@ class Game:
                 print(spawner["pos"], "enemy")
                 self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
 
+
+        self.projectiles = []
         self.particles = []
 
         self.scroll = [0, 0]
@@ -91,10 +94,25 @@ class Game:
             self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
             self.player.render(self.display, offset=render_scroll)
 
+            # [[x,y], direction, timer]
+            for projectile in self.projectiles.copy():
+                projectile[0][0] += projectile[1]
+                projectile[2] += 1
+                img = self.assets["projectile"]
+                self.display.blit(img, (projectile[0][0] - img.get_width() / 2 -render_scroll[0], projectile[0][1] - img.get_height() / 2 - render_scroll[1]))
+                if self.tilemap.solid_tile_check(projectile[0]):
+                    self.projectiles.remove(projectile)
+                elif projectile[2] > 360:
+                    self.projectiles.remove(projectile)
+                elif abs(self.player.dashing) < 50:  # that makes the player invincible when dashing
+                    if self.player.rect().collidepoint(projectile[0]):
+                        self.projectiles.remove(projectile)
+
+
             for particle in self.particles.copy():
                 kill = particle.update()
                 particle.render(self.display, offset=render_scroll)
-                if particle.p_type == 'leaf':
+                if particle.p_type == "leaf":
                     particle.pos[0] += math.sin(particle.pos[1] / 10) * 0.5
                 if kill:
                     self.particles.remove(particle)
