@@ -1,4 +1,8 @@
 import pygame
+import math
+import random
+
+from scripts.particle import Particle
 
 class PhysicsEntity:
     def __init__(self, game, e_type, pos, size):
@@ -76,6 +80,7 @@ class Player(PhysicsEntity):
         self.air_time = 0
         self.jumps = 1
         self.wall_slide = False
+        self.dashing = 0
     
     def update(self, tilemap, movement=(0, 0)):
         super().update(tilemap, movement=movement)
@@ -93,7 +98,7 @@ class Player(PhysicsEntity):
                 self.flip = False
             else:
                 self.flip = True
-            self.set_action('wall_slide')
+            
         
         if not self.wall_slide:
             if self.air_time > 4:
@@ -102,12 +107,33 @@ class Player(PhysicsEntity):
                 self.set_action('run')
             else:
                 self.set_action('idle')
+
+        if self.dashing > 0:
+            self.dashing = max(0, self.dashing - 1)
+        if self.dashing < 0:
+            self.dashing = min(0, self.dashing + 1)
+        if abs(self.dashing) > 50:
+            self.velocity[0] = abs(self.dashing) / self.dashing * 8
+            if abs(self.dashing) == 51:
+                self.velocity[0] *= 0.1
+        if abs(self.dashing) in {60 , 50}:
+            for i in range(10):
+                angle = random.random() * math.pi * 2
+                speed = random.random() * 0.5 + 1
+                pvelocity = [math.cos(angle) * speed, math.sin(angle) * speed]
+                self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=pvelocity))
+
                 
         if self.velocity[0] > 0:
             self.velocity[0] = max(self.velocity[0] - 0.1, 0)
         else:
             self.velocity[0] = min(self.velocity[0] + 0.1, 0)
-            
+
+    def render(self, surf, offset=(0, 0)):
+        if abs(self. dashing) <= 50:
+            super().render(surf, offset=offset)
+
+
     def jump(self):
         if self.wall_slide:
             if self.flip and self.last_movement[0] < 0:
@@ -128,3 +154,10 @@ class Player(PhysicsEntity):
             self.jumps -= 1
             self.air_time = 5
             return True
+        
+    def dash(self):
+        if not self.dashing:
+            if self.flip:
+                self.dashing = -60
+            else:
+                self.dashing = 60
