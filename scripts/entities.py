@@ -74,6 +74,41 @@ class PhysicsEntity:
     def render(self, surf, offset=(0, 0)):
         surf.blit(pygame.transform.flip(self.animation.img(), self.flip, False), (self.pos[0] - offset[0] + self.anim_offset[0], self.pos[1] - offset[1] + self.anim_offset[1]))
 
+
+class Enemy(PhysicsEntity):
+    def __init__(self, game, pos, size):
+        super().__init__(game, 'enemy', pos, size)
+
+        self.walking = 0
+
+    def update(self, tilemap, movement=(0, 0)):
+        if self.walking:
+            if tilemap.solid_tile_check((self.rect().centerx + (-7 if self.flip else 7), self.pos[1] + 23)):
+                if (self.collisions['right'] and self.flip) or self.collisions['left']:
+                    self.flip = not self.flip
+                else:
+                    movement = (movement[0] - 0.5 if self.flip else 0.5, movement[1])
+            else:
+                self.flip = not self.flip
+            self.walking = max(0, self.walking - 1)
+        elif random.random() < 0.01:  # 1% chance of changing direction
+            self.walking = random.randint(30, 120)
+
+        super().update(tilemap, movement=movement)
+
+        if movement[0] != 0:
+            self.set_action("run")
+        else:
+            self.set_action("idle")
+
+    def render(self, surf, offset=(0, 0)):
+        super().render(surf, offset=offset)
+
+        if self.flip:
+            surf.blit(pygame.transform.flip(self.game.assets["gun"], True, False), (self.rect().centerx - 4 - self.game.assets["gun"].get_width() - offset[0], self.rect().centery - offset[1]))
+        else:
+            surf.blit(self.game.assets["gun"], (self.rect().centerx + 4 - offset[0], self.rect().centery - offset[1]))
+
 class Player(PhysicsEntity):
     def __init__(self, game, pos, size):
         super().__init__(game, 'player', pos, size)
@@ -98,6 +133,7 @@ class Player(PhysicsEntity):
                 self.flip = False
             else:
                 self.flip = True
+            self.set_action('wall_slide')
             
         
         if not self.wall_slide:
@@ -116,6 +152,9 @@ class Player(PhysicsEntity):
             self.velocity[0] = abs(self.dashing) / self.dashing * 8
             if abs(self.dashing) == 51:
                 self.velocity[0] *= 0.1
+                pvelocity = [abs(self.dashing) / self.dashing * random.random() * 3, 0]
+                self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=pvelocity))
+
         if abs(self.dashing) in {60 , 50}:
             for i in range(10):
                 angle = random.random() * math.pi * 2

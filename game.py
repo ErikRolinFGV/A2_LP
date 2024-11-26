@@ -5,7 +5,7 @@ import math
 import pygame
 
 from scripts.util import load_image, load_images, Animation
-from scripts.entities import PhysicsEntity, Player
+from scripts.entities import PhysicsEntity, Player, Enemy
 from scripts.tilemap import Tilemap
 from scripts.clouds import Clouds
 from scripts.particle import Particle
@@ -35,8 +35,11 @@ class Game:
             'player/jump': Animation(load_images('entities/player/jump')),
             'player/slide': Animation(load_images('entities/player/slide')),
             'player/wall_slide': Animation(load_images('entities/player/wall_slide')),
+            "enemy/idle": Animation(load_images("entities/enemy/idle"), img_dur=6),
+            "enemy/run": Animation(load_images("entities/enemy/run"), img_dur=4),
             "particles/leaf": Animation(load_images('particles/leaf'), img_dur=40, loop=False),
-            "particles/particle": Animation(load_images('particles/particle'), img_dur=6, loop=False)  
+            "particles/particle": Animation(load_images('particles/particle'), img_dur=6, loop=False) ,
+            "gun": load_image("gun.png")
         }
         
         self.clouds = Clouds(self.assets['clouds'], count=16)
@@ -50,6 +53,14 @@ class Game:
         for tree in self.tilemap.extract([('large_decor', 2)], keep=True):
             self.leaf_spawners.append(pygame.Rect(4 + tree['pos'][0], 4 + tree['pos'][1], 16, 16))
         print(self.leaf_spawners)
+
+        self.enemies = []
+        for spawner in self.tilemap.extract([("spawners", 0), ("spawners", 1)]):
+            if spawner["variant"] == 0:
+                self.player.pos = spawner["pos"]
+            else:
+                print(spawner["pos"], "enemy")
+                self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
 
         self.particles = []
 
@@ -73,6 +84,10 @@ class Game:
             
             self.tilemap.render(self.display, offset=render_scroll)
             
+            for enemy in self.enemies.copy():
+                enemy.update(self.tilemap)
+                enemy.render(self.display, offset=render_scroll)
+                
             self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
             self.player.render(self.display, offset=render_scroll)
 

@@ -46,6 +46,11 @@ class Tilemap:
         self.tile_size = map_data['tile_size']
         self.offgrid_tiles = map_data['offgrid']
 
+    def solid_tile_check(self, pos):
+        tile_location = str(int(pos[0] // self.tile_size)) + ";" + str(int(pos[1] // self.tile_size))
+        if tile_location in self.tilemap:
+            if self.tilemap[tile_location]['type'] in PHYSICS_TILES:
+                return self.tilemap[tile_location]
 
     
     def tiles_around(self, pos):
