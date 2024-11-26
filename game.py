@@ -49,7 +49,7 @@ class Game:
         
         self.tilemap = Tilemap(self, tile_size=16)
         self.tilemap.load("map_json")
-        
+        #Add level spawner (4:43)
         self.leaf_spawners = []
         for tree in self.tilemap.extract([('large_decor', 2)], keep=True):
             self.leaf_spawners.append(pygame.Rect(4 + tree['pos'][0], 4 + tree['pos'][1], 16, 16))
@@ -68,6 +68,8 @@ class Game:
         self.particles = []
 
         self.scroll = [0, 0]
+
+        
         
     def run(self):
         while True:
@@ -88,8 +90,12 @@ class Game:
             self.tilemap.render(self.display, offset=render_scroll)
             
             for enemy in self.enemies.copy():
+                kill = enemy.update(self.tilemap, (0, 0))
                 enemy.update(self.tilemap)
                 enemy.render(self.display, offset=render_scroll)
+                if kill:
+                    self.enemies.remove(enemy)
+
                 
             self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
             self.player.render(self.display, offset=render_scroll)
