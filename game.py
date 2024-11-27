@@ -48,32 +48,41 @@ class Game:
         self.player = Player(self, (50, 50), (8, 15))
         
         self.tilemap = Tilemap(self, tile_size=16)
-        self.tilemap.load("map_json")
+        self.load_game_level(0)
         #Add level spawner (4:43)
-        self.leaf_spawners = []
-        for tree in self.tilemap.extract([('large_decor', 2)], keep=True):
-            self.leaf_spawners.append(pygame.Rect(4 + tree['pos'][0], 4 + tree['pos'][1], 16, 16))
-        print(self.leaf_spawners)
-        
-        self.enemies = []
-        for spawner in self.tilemap.extract([("spawners", 0), ("spawners", 1)]):
-            if spawner["variant"] == 0:
-                self.player.pos = spawner["pos"]
-            else:
-                print(spawner["pos"], "enemy")
-                self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
+
+    def load_game_level(self, map_id):
+            self.tilemap.load("data/maps/" + str(map_id) + ".json")
+
+            self.leaf_spawners = []
+            for tree in self.tilemap.extract([('large_decor', 2)], keep=True):
+                self.leaf_spawners.append(pygame.Rect(4 + tree['pos'][0], 4 + tree['pos'][1], 16, 16))
+            print(self.leaf_spawners)
+            
+            self.enemies = []
+            for spawner in self.tilemap.extract([("spawners", 0), ("spawners", 1)]):
+                if spawner["variant"] == 0:
+                    self.player.pos = spawner["pos"]
+                else:
+                    print(spawner["pos"], "enemy")
+                    self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
 
 
-        self.projectiles = []
-        self.particles = []
+            self.projectiles = []
+            self.particles = []
 
-        self.scroll = [0, 0]
-
+            self.scroll = [0, 0]
+            self.dead = 0
         
         
     def run(self):
-        while True:
+        while True: 
             self.display.blit(self.assets['background'], (0, 0))
+
+            if self.dead:
+                self.dead += 1
+                if self.dead > 40:
+                    self.load_game_level(0)
             
             self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]) / 30
             self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1]) / 30
@@ -96,9 +105,9 @@ class Game:
                 if kill:
                     self.enemies.remove(enemy)
 
-                
-            self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
-            self.player.render(self.display, offset=render_scroll)
+            if not self.dead:  
+                self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
+                self.player.render(self.display, offset=render_scroll)
 
             # [[x,y], direction, timer]
             for projectile in self.projectiles.copy():
@@ -108,11 +117,13 @@ class Game:
                 self.display.blit(img, (projectile[0][0] - img.get_width() / 2 -render_scroll[0], projectile[0][1] - img.get_height() / 2 - render_scroll[1]))
                 if self.tilemap.solid_tile_check(projectile[0]):
                     self.projectiles.remove(projectile)
+                    
                 elif projectile[2] > 360:
                     self.projectiles.remove(projectile)
                 elif abs(self.player.dashing) < 50:  # that makes the player invincible when dashing
                     if self.player.rect().collidepoint(projectile[0]):
                         self.projectiles.remove(projectile)
+                        self.dead += 1
 
 
             for particle in self.particles.copy():

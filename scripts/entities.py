@@ -93,7 +93,7 @@ class Enemy(PhysicsEntity):
             self.walking = max(0, self.walking - 1)
             if not self.walking:
                 dist_to_player = (self.game.player.pos[0] - self.pos[0], self.game.player.pos[1] - self.pos[1] - self.pos[1])
-                if (abs(dist_to_player[1]) < 16):
+                if (abs(dist_to_player[1]) > 16):
                     if (self.flip and dist_to_player[0] < 0):
                         self.game.projectiles.append([[self.rect().centerx - 7, self.rect().centery], -1, 0])
                     if (self.flip and dist_to_player[0] > 0):
@@ -181,7 +181,6 @@ class Player(PhysicsEntity):
             self.velocity[0] = min(self.velocity[0] + 0.1, 0)
 
     def render(self, surf, offset=(0, 0)):
-        if abs(self. dashing) <= 50:
             super().render(surf, offset=offset)
 
 
