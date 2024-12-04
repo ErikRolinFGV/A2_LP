@@ -14,8 +14,8 @@ class Game:
     def __init__(self):
         pygame.init()
 
-        pygame.display.set_caption('??')
-        self.screen = pygame.display.set_mode((640, 480))
+        pygame.display.set_caption("????")
+        self.screen = pygame.display.set_mode((1000, 720))
         self.display = pygame.Surface((320, 240))
 
         self.clock = pygame.time.Clock()
@@ -24,6 +24,11 @@ class Game:
 
         self.possible_scores = [50,60,70,80,90,100]
         self.points = 0
+
+        pygame.mixer.init()
+        pygame.mixer.music.load('data/music.wav')  
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)             
         
         self.assets = {
             'decor': load_images('tiles/decor'),
@@ -41,7 +46,7 @@ class Game:
             "enemy/idle": Animation(load_images("entities/enemy/idle"), img_dur=6),
             "enemy/run": Animation(load_images("entities/enemy/run"), img_dur=4),
             "particles/leaf": Animation(load_images('particles/leaf'), img_dur=40, loop=False),
-            "particles/particle": Animation(load_images('particles/particle'), img_dur=6, loop=False) ,
+            "particles/particle": Animation(load_images('particles/particle'), img_dur=6, loop=False),
             "gun": load_image("gun.png"),
             "projectile": load_image("projectile.png")
         }
@@ -52,8 +57,9 @@ class Game:
         
         self.tilemap = Tilemap(self, tile_size=16)
 
-        self.level = 1
+        self.level = 0
         self.load_game_level(self.level)
+        self.game_over = False
         #Add level spawner (4:43)
 
     def load_game_level(self, map_id):
@@ -80,15 +86,51 @@ class Game:
 
             self.scroll = [0, 0]
             self.dead = 0
-        
+
+
+    def render_end_screen(self):
+        self.display.blit(self.assets['background'], (0, 0))  # Black screen
+
+        font = pygame.font.Font(None, 30)  # Text font
+        text = font.render(f"Você completou o jogo!", True, (255, 255, 255))
+        score = font.render(f"Sua pontuação: {self.points}", True, (255, 255, 0))
+        instructions = font.render("R para reiniciar ou Q para sair", True, (255, 255, 255))
+
+        self.display.blit(text, (self.display.get_width() // 2 - text.get_width() // 2, 80))
+        self.display.blit(score, (self.display.get_width() // 2 - score.get_width() // 2, 120))
+        self.display.blit(instructions, (self.display.get_width() // 2 - instructions.get_width() // 2, 160))
+
+        # Scale the display surface to the screen size
+        scaled_display = pygame.transform.scale(self.display, self.screen.get_size())
+        self.screen.blit(scaled_display, (0, 0))
+        pygame.display.update()
+   
         
     def run(self):
         while True: 
             self.display.blit(self.assets['background'], (0, 0))
 
+            if self.game_over:
+                self.render_end_screen()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_r:
+                            self.level = 1
+                            self.points = 0
+                            self.game_over = False
+                            self.load_game_level(self.level)
+                        if event.key == pygame.K_q:
+                            pygame.quit()
+                            sys.exit()
+                continue
+
             if not len(self.enemies):
                 self.level += 1
-                self.load_game_level(self.level)
+                if self.level > 4:
+                    self.game_over = True
             
             if self.dead:
                 self.dead += 1
@@ -177,5 +219,3 @@ class Game:
             self.clock.tick(60)
 
 Game().run()
-
-
