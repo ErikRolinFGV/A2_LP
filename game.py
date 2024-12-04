@@ -51,7 +51,9 @@ class Game:
         self.player = Player(self, (50, 50), (8, 15))
         
         self.tilemap = Tilemap(self, tile_size=16)
-        self.load_game_level(1)
+
+        self.level = 1
+        self.load_game_level(self.level)
         #Add level spawner (4:43)
 
     def load_game_level(self, map_id):
@@ -70,6 +72,8 @@ class Game:
                     print(spawner["pos"], "enemy")
                     self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
 
+           
+
 
             self.projectiles = []
             self.particles = []
@@ -81,11 +85,15 @@ class Game:
     def run(self):
         while True: 
             self.display.blit(self.assets['background'], (0, 0))
+
+            if not len(self.enemies):
+                self.level += 1
+                self.load_game_level(self.level)
             
             if self.dead:
                 self.dead += 1
                 if self.dead > 40:
-                    self.load_game_level(0)
+                    self.load_game_level(self.level)
                     self.points = 0
             
             self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]) / 30

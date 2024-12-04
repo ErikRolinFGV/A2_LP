@@ -91,13 +91,14 @@ class Enemy(PhysicsEntity):
             else:
                 self.flip = not self.flip
             self.walking = max(0, self.walking - 1)
+            
             if not self.walking:
-                dist_to_player = (self.game.player.pos[0] - self.pos[0], self.game.player.pos[1] - self.pos[1] - self.pos[1])
-                if (abs(dist_to_player[1]) > 16):
+                dist_to_player = (self.game.player.pos[0] - self.pos[0], self.game.player.pos[1] - self.pos[1])
+                if (abs(dist_to_player[1]) < 16):
                     if (self.flip and dist_to_player[0] < 0):
-                        self.game.projectiles.append([[self.rect().centerx - 7, self.rect().centery], -1, 0])
-                    if (self.flip and dist_to_player[0] > 0):
-                         self.game.projectiles.append([[self.rect().centerx + 7, self.rect().centery], 1, 0])
+                        self.game.projectiles.append([[self.rect().centerx - 7, self.rect().centery], -1.5, 0])
+                    if (not self.flip and dist_to_player[0] > 0):
+                         self.game.projectiles.append([[self.rect().centerx + 7, self.rect().centery], 1.5, 0])
                        
         elif random.random() < 0.01:  # 1% chance of changing direction
             self.walking = random.randint(30, 120)
@@ -133,6 +134,10 @@ class Player(PhysicsEntity):
         super().update(tilemap, movement=movement)
         
         self.air_time += 1
+
+        if self.air_time > 120:
+            self.game.dead = 1
+
         if self.collisions['down']:
             self.air_time = 0
             self.jumps = 1
