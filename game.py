@@ -21,6 +21,9 @@ class Game:
         self.clock = pygame.time.Clock()
         
         self.movement = [False, False]
+
+        self.possible_scores = [50,60,70,80,90,100]
+        self.points = 0
         
         self.assets = {
             'decor': load_images('tiles/decor'),
@@ -48,7 +51,7 @@ class Game:
         self.player = Player(self, (50, 50), (8, 15))
         
         self.tilemap = Tilemap(self, tile_size=16)
-        self.load_game_level(0)
+        self.load_game_level(1)
         #Add level spawner (4:43)
 
     def load_game_level(self, map_id):
@@ -78,11 +81,12 @@ class Game:
     def run(self):
         while True: 
             self.display.blit(self.assets['background'], (0, 0))
-
+            
             if self.dead:
                 self.dead += 1
                 if self.dead > 40:
                     self.load_game_level(0)
+                    self.points = 0
             
             self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]) / 30
             self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1]) / 30
@@ -104,6 +108,8 @@ class Game:
                 enemy.render(self.display, offset=render_scroll)
                 if kill:
                     self.enemies.remove(enemy)
+                    self.points += random.choice(self.possible_scores)
+                    print(self.points)
 
             if not self.dead:  
                 self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
@@ -133,6 +139,10 @@ class Game:
                     particle.pos[0] += math.sin(particle.pos[1] / 10) * 0.5
                 if kill:
                     self.particles.remove(particle)
+
+            self.font = pygame.font.Font(None, 24)
+            score_text = self.font.render(f"Pontuação: {self.points}", True, (255, 255, 255))
+            self.display.blit(score_text, (10, 10))
 
 
             for event in pygame.event.get():
