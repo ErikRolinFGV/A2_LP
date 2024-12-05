@@ -12,10 +12,67 @@ from src.particle import Particle
 from src.menu import Menu
 
 class Game:
+    """
+    A class to represent the game.
+    Attributes
+    ----------
+    screen : pygame.Surface
+        The main screen surface.
+    display : pygame.Surface
+        The display surface for rendering.
+    clock : pygame.time.Clock
+        The game clock.
+    movement : list
+        A list to track player movement.
+    possible_scores : list
+        A list of possible scores.
+    points : int
+        The player's current score.
+    assets : dict
+        A dictionary to store game assets.
+    clouds : Clouds
+        The clouds in the game.
+    player : Player
+        The player character.
+    tilemap : Tilemap
+        The tilemap of the game.
+    level : int
+        The current game level.
+    game_over : bool
+        A flag to indicate if the game is over.
+    in_menu : bool
+        A flag to indicate if the game is in the menu.
+    menu : Menu
+        The game menu.
+    death_sound : pygame.mixer.Sound
+        The sound played when the player dies.
+    jump_sound : pygame.mixer.Sound
+        The sound played when the player jumps.
+    leaf_spawners : list
+        A list of leaf spawners.
+    enemies : list
+        A list of enemies.
+    projectiles : list
+        A list of projectiles.
+    particles : list
+        A list of particles.
+    scroll : list
+        The scroll offset.
+    dead : int
+        A counter for the player's death state.
+    Methods
+    -------
+    load_game_level(map_id):
+        Loads the game level with the given map ID.
+    render_end_screen():
+        Renders the end screen when the game is over.
+    run():
+        The main game loop.
+    """
     def __init__(self):
         pygame.init()
 
-        pygame.display.set_caption("Game Title")
+        pygame.display.set_caption("Monk the Monkey")
         self.screen = pygame.display.set_mode((1000, 720))
         self.display = pygame.Surface((320, 240))
 
@@ -72,6 +129,24 @@ class Game:
 
 
     def load_game_level(self, map_id):
+        """
+        Loads the game level based on the provided map ID.
+        Args:
+            map_id (int): The ID of the map to load.
+        This method performs the following actions:
+        1. Loads the tilemap from a JSON file corresponding to the map ID.
+        2. Extracts 'large_decor' tiles and initializes leaf spawners.
+        3. Extracts 'spawners' tiles and initializes player position and enemies.
+        4. Initializes empty lists for projectiles and particles.
+        5. Resets the scroll position and dead status.
+        Attributes:
+            leaf_spawners (list): A list of pygame.Rect objects representing leaf spawners.
+            enemies (list): A list of Enemy objects.
+            projectiles (list): An empty list for projectiles.
+            particles (list): An empty list for particles.
+            scroll (list): A list representing the scroll position, initialized to [0, 0].
+            dead (int): A flag indicating the dead status, initialized to 0.
+        """
         self.tilemap.load("data/maps/" + str(map_id) + ".json")
 
         self.leaf_spawners = []
@@ -94,6 +169,18 @@ class Game:
         self.dead = 0
 
     def render_end_screen(self):
+        """
+        Renders the end screen of the game.
+        This method displays the end screen with a background, a congratulatory message,
+        the player's score, and instructions for restarting or quitting the game.
+        The text is displayed in the center of the screen with the following details:
+        - "Você completou o jogo!" in white color
+        - "Sua pontuação: {self.points}" in yellow color
+        - "R para reiniciar ou Q para sair" in white color
+        The display is then scaled to fit the screen size and updated.
+        Returns:
+            None
+        """
         self.display.blit(self.assets['background'], (0, 0))
 
         font = pygame.font.Font(None, 30)  # Text font
@@ -110,6 +197,36 @@ class Game:
         pygame.display.update()
    
     def run(self):
+        """
+        Main game loop that handles rendering, events, and game state updates.
+        The loop continuously performs the following tasks:
+        - Renders the background and various game elements (menu, end screen, game objects).
+        - Handles user input and events (keyboard and quit events).
+        - Updates game state based on user input and game logic (e.g., player movement, enemy updates, projectile updates).
+        - Manages game transitions (e.g., from menu to game, game over to restart).
+        - Renders the updated game state to the display and updates the screen.
+        Attributes:
+            self.display (pygame.Surface): The main display surface for rendering.
+            self.assets (dict): Dictionary containing game assets (e.g., images, sounds).
+            self.in_menu (bool): Flag indicating if the game is in the menu state.
+            self.menu (Menu): The menu object for rendering the game menu.
+            self.game_over (bool): Flag indicating if the game is over.
+            self.level (int): The current game level.
+            self.points (int): The player's score.
+            self.dead (int): Counter for player death state.
+            self.scroll (list): List containing scroll offsets for rendering.
+            self.leaf_spawners (list): List of rectangles for spawning leaf particles.
+            self.particles (list): List of particle objects.
+            self.clouds (Clouds): The clouds object for rendering clouds.
+            self.tilemap (Tilemap): The tilemap object for rendering the game world.
+            self.enemies (list): List of enemy objects.
+            self.player (Player): The player object.
+            self.movement (list): List containing movement flags for the player.
+            self.projectiles (list): List of projectiles in the game.
+            self.font (pygame.font.Font): Font object for rendering text.
+            self.screen (pygame.Surface): The main screen surface for rendering.
+            self.clock (pygame.time.Clock): Clock object for controlling the frame rate.
+        """
         while True: 
             self.display.blit(self.assets['background'], (0, 0))
 

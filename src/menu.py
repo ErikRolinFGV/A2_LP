@@ -1,6 +1,6 @@
 import pygame
 from src.util import load_image
-
+print(pygame.version.ver)
 class Menu:
     """
     A class to represent the game menu.
@@ -34,3 +34,4 @@ class Menu:
         scaled_display = pygame.transform.scale(self.display, self.screen.get_size())
         self.screen.blit(scaled_display, (0, 0))
         pygame.display.update()
+
