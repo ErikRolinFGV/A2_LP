@@ -9,12 +9,13 @@ from scripts.entities import PhysicsEntity, Player, Enemy
 from scripts.tilemap import Tilemap
 from scripts.clouds import Clouds
 from scripts.particle import Particle
+from scripts.menu import Menu
 
 class Game:
     def __init__(self):
         pygame.init()
 
-        pygame.display.set_caption("????")
+        pygame.display.set_caption("Game Title")
         self.screen = pygame.display.set_mode((1000, 720))
         self.display = pygame.Surface((320, 240))
 
@@ -60,36 +61,34 @@ class Game:
         self.level = 0
         self.load_game_level(self.level)
         self.game_over = False
-        #Add level spawner (4:43)
+        self.in_menu = True
+
+        self.menu = Menu(self.screen, self.display, self.assets)
 
     def load_game_level(self, map_id):
-            self.tilemap.load("data/maps/" + str(map_id) + ".json")
+        self.tilemap.load("data/maps/" + str(map_id) + ".json")
 
-            self.leaf_spawners = []
-            for tree in self.tilemap.extract([('large_decor', 2)], keep=True):
-                self.leaf_spawners.append(pygame.Rect(4 + tree['pos'][0], 4 + tree['pos'][1], 16, 16))
-            print(self.leaf_spawners)
-            
-            self.enemies = []
-            for spawner in self.tilemap.extract([("spawners", 0), ("spawners", 1)]):
-                if spawner["variant"] == 0:
-                    self.player.pos = spawner["pos"]
-                else:
-                    print(spawner["pos"], "enemy")
-                    self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
+        self.leaf_spawners = []
+        for tree in self.tilemap.extract([('large_decor', 2)], keep=True):
+            self.leaf_spawners.append(pygame.Rect(4 + tree['pos'][0], 4 + tree['pos'][1], 16, 16))
+        print(self.leaf_spawners)
+        
+        self.enemies = []
+        for spawner in self.tilemap.extract([("spawners", 0), ("spawners", 1)]):
+            if spawner["variant"] == 0:
+                self.player.pos = spawner["pos"]
+            else:
+                print(spawner["pos"], "enemy")
+                self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
 
-           
+        self.projectiles = []
+        self.particles = []
 
-
-            self.projectiles = []
-            self.particles = []
-
-            self.scroll = [0, 0]
-            self.dead = 0
-
+        self.scroll = [0, 0]
+        self.dead = 0
 
     def render_end_screen(self):
-        self.display.blit(self.assets['background'], (0, 0))  # Black screen
+        self.display.blit(self.assets['background'], (0, 0))
 
         font = pygame.font.Font(None, 30)  # Text font
         text = font.render(f"Você completou o jogo!", True, (255, 255, 255))
@@ -100,15 +99,24 @@ class Game:
         self.display.blit(score, (self.display.get_width() // 2 - score.get_width() // 2, 120))
         self.display.blit(instructions, (self.display.get_width() // 2 - instructions.get_width() // 2, 160))
 
-        # Scale the display surface to the screen size
         scaled_display = pygame.transform.scale(self.display, self.screen.get_size())
         self.screen.blit(scaled_display, (0, 0))
         pygame.display.update()
    
-        
     def run(self):
         while True: 
             self.display.blit(self.assets['background'], (0, 0))
+
+            if self.in_menu:
+                self.menu.render()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_x:
+                            self.in_menu = False
+                continue
 
             if self.game_over:
                 self.render_end_screen()
@@ -128,9 +136,11 @@ class Game:
                 continue
 
             if not len(self.enemies):
-                self.level += 1
                 if self.level > 4:
                     self.game_over = True
+                else:
+                    self.level += 1
+                    self.load_game_level(self.level)
             
             if self.dead:
                 self.dead += 1
