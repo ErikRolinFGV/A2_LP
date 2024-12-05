@@ -4,12 +4,12 @@ import math
 
 import pygame
 
-from scripts.util import load_image, load_images, Animation
-from scripts.entities import PhysicsEntity, Player, Enemy
-from scripts.tilemap import Tilemap
-from scripts.clouds import Clouds
-from scripts.particle import Particle
-from scripts.menu import Menu
+from src.util import load_image, load_images, Animation
+from src.entities import PhysicsEntity, Player, Enemy
+from src.tilemap import Tilemap
+from src.clouds import Clouds
+from src.particle import Particle
+from src.menu import Menu
 
 class Game:
     def __init__(self):
