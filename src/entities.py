@@ -129,6 +129,9 @@ class Player(PhysicsEntity):
         self.jumps = 1
         self.wall_slide = False
         self.dashing = 0
+        self.jump_sound = pygame.mixer.Sound('data/sfx/jump.wav')
+        self.dash_sound = pygame.mixer.Sound('data/sfx/dash.wav')
+
     
     def update(self, tilemap, movement=(0, 0)):
         super().update(tilemap, movement=movement)
@@ -208,11 +211,14 @@ class Player(PhysicsEntity):
             self.velocity[1] = -3
             self.jumps -= 1
             self.air_time = 5
+            self.jump_sound.play()
             return True
         
     def dash(self):
         if not self.dashing:
             if self.flip:
                 self.dashing = -60
+                self.dash_sound.play()
             else:
                 self.dashing = 60
+                self.dash_sound.play()

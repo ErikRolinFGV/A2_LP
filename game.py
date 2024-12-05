@@ -65,6 +65,11 @@ class Game:
 
         self.menu = Menu(self.screen, self.display, self.assets)
 
+        # Load death sound
+        self.death_sound = pygame.mixer.Sound('data/sfx/hit.wav')
+
+
+
     def load_game_level(self, map_id):
         self.tilemap.load("data/maps/" + str(map_id) + ".json")
 
@@ -190,7 +195,7 @@ class Game:
                     if self.player.rect().collidepoint(projectile[0]):
                         self.projectiles.remove(projectile)
                         self.dead += 1
-
+                        self.death_sound.play()  # Play death sound
 
             for particle in self.particles.copy():
                 kill = particle.update()
