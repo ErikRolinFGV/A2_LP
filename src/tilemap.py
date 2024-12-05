@@ -6,6 +6,35 @@ NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1)
 PHYSICS_TILES = {'grass', 'stone'}
 
 class Tilemap:
+    """
+    A class to represent a tilemap for a game.
+    Attributes:
+    -----------
+    game : object
+        The game instance to which this tilemap belongs.
+    tile_size : int, optional
+        The size of each tile in the tilemap (default is 16).
+    tilemap : dict
+        A dictionary to store the tiles in the grid.
+    offgrid_tiles : list
+        A list to store tiles that are not on the grid.
+    Methods:
+    --------
+    extract(id_pairs, keep=False):
+        Extracts tiles matching the given id pairs from the tilemap and offgrid tiles.
+    save(path):
+        Saves the current state of the tilemap to a file.
+    load(path):
+        Loads the tilemap state from a file.
+    solid_tile_check(pos):
+        Checks if there is a solid tile at the given position.
+    tiles_around(pos):
+        Returns a list of tiles around the given position.
+    physics_rects_around(pos):
+        Returns a list of physics rectangles around the given position.
+    render(surf, offset=(0, 0)):
+        Renders the tilemap onto the given surface with an optional offset.
+    """
     def __init__(self, game, tile_size=16):
         self.game = game
         self.tile_size = tile_size

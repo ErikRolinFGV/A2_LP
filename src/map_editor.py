@@ -8,7 +8,37 @@ from tilemap import Tilemap
 RENDER_SCALE = 2.0
 
 class map_editor:
+    """
+    A class to represent a map editor for a tile-based game.
+    Methods
+    -------
+    __init__():
+        Initializes the map editor, sets up the display, loads assets, and initializes variables.
+    run():
+        Main loop of the map editor. Handles rendering, input events, and tile placement/removal.
+    """
     def __init__(self):
+        """
+        Initializes the map editor.
+        This method sets up the Pygame environment, initializes the display, loads assets,
+        and prepares the tilemap for editing. It also sets up various control flags and 
+        parameters for user interaction.
+        Attributes:
+            screen (pygame.Surface): The main display surface.
+            display (pygame.Surface): The surface used for rendering the map.
+            clock (pygame.time.Clock): The clock object to manage the frame rate.
+            assets (dict): A dictionary containing loaded images for different tile types.
+            movement (list): A list of booleans indicating movement directions.
+            tilemap (Tilemap): The tilemap object used for map editing.
+            scroll (list): A list containing the scroll offsets for the map.
+            tile_list (list): A list of tile types available for editing.
+            tile_group (int): The current tile group selected.
+            tile_variant (int): The current tile variant selected.
+            clicking (bool): A flag indicating if the left mouse button is being clicked.
+            right_clicking (bool): A flag indicating if the right mouse button is being clicked.
+            shift (bool): A flag indicating if the shift key is pressed.
+            ongrid (bool): A flag indicating if the tiles should snap to the grid.
+        """
         pygame.init()
 
         pygame.display.set_caption('MAP_EDITOR')
@@ -55,6 +85,32 @@ class map_editor:
 
         
     def run(self):
+        """
+        Main loop of the map editor.
+        This method handles the rendering of the map, user input, and updating the display.
+        It runs continuously until the user quits the application.
+        Functionality:
+        - Fills the display with a black background.
+        - Updates the scroll position based on user movement.
+        - Renders the tilemap with the current scroll offset.
+        - Displays the current tile image with transparency at the mouse position.
+        - Handles tile placement and removal on the grid and off the grid.
+        - Updates the display with the current tile image.
+        - Processes user input events such as mouse clicks, mouse wheel scrolling, and keyboard presses.
+        - Handles quitting the application.
+        User Controls:
+        - Left mouse button: Place tile on the grid or off the grid.
+        - Right mouse button: Remove tile from the grid or off the grid.
+        - Mouse wheel: Change tile variant or tile group.
+        - Arrow keys: Move the view (scroll).
+        - 'G' key: Toggle grid snapping.
+        - 'O' key: Save the current map.
+        - Left Shift key: Enable shift mode for changing tile variants.
+        Note:
+        - The method assumes that the `pygame` library is initialized and the necessary attributes
+          (`display`, `scroll`, `movement`, `tilemap`, `assets`, `tile_list`, `tile_group`, `tile_variant`,
+          `clicking`, `right_clicking`, `ongrid`, `shift`, `screen`, `clock`) are properly set up.
+        """
         while True:
             self.display.fill((0, 0, 0))
 

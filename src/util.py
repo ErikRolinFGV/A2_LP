@@ -16,6 +16,31 @@ def load_images(path):
     return images
 
 class Animation:
+    """
+    A class to represent an animation sequence.
+    Attributes:
+    -----------
+    images : list
+        A list of images that make up the animation.
+    loop : bool
+        A flag to determine if the animation should loop.
+    img_duration : int
+        The duration each image is displayed for.
+    done : bool
+        A flag to indicate if the animation is done (used when loop is False).
+    frame : int
+        The current frame of the animation.
+    Methods:
+    --------
+    __init__(images, img_dur=5, loop=True):
+        Initializes the Animation object with images, image duration, and loop flag.
+    copy():
+        Returns a copy of the current Animation object.
+    update():
+        Updates the current frame of the animation. If looping, it wraps around. If not looping, it stops at the last frame.
+    img():
+        Returns the current image to be displayed based on the current frame.
+    """
     def __init__(self, images, img_dur=5, loop=True):
         self.images = images
         self.loop = loop

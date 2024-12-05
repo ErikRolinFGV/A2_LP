@@ -67,6 +67,7 @@ class Game:
 
         # Load death sound
         self.death_sound = pygame.mixer.Sound('data/sfx/hit.wav')
+        self.jump_sound = pygame.mixer.Sound('data/sfx/jump.wav')
 
 
 

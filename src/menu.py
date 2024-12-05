@@ -2,6 +2,23 @@ import pygame
 from src.util import load_image
 
 class Menu:
+    """
+    A class to represent the game menu.
+    Attributes
+    ----------
+    screen : pygame.Surface
+        The main screen surface where the menu will be rendered.
+    display : pygame.Surface
+        The display surface where the menu image will be initially rendered.
+    assets : dict
+        A dictionary containing game assets.
+    menu_image : pygame.Surface
+        The image used for the menu background.
+    Methods
+    -------
+    render():
+        Renders the menu on the screen.
+    """
     def __init__(self, screen, display, assets):
         self.screen = screen
         self.display = display
